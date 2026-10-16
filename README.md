@@ -19,6 +19,7 @@ API key**, and then put the heavy models behind the same interfaces.
 - [Quickstart (no models)](#quickstart-no-models)
 - [With real models](#with-real-models)
 - [Docker](#docker)
+- [Deploy your own](#deploy-your-own)
 - [Evaluation](#evaluation)
 - [API](#api)
 - [Metadata filters](#metadata-filters)
@@ -173,21 +174,39 @@ with*, and warms the model caches, so the container never needs the network at
 runtime.
 
 ```bash
-# ~250 MB: NumPy + hashing + lexical fallbacks, no model download
-WITH_MODELS=false docker compose up --build
-
 # ~2 GB: FAISS + Sentence Transformers + cross-encoder, baked into the image
 docker compose up --build
+
+# ~250 MB: NumPy + hashing + lexical fallbacks, no model download
+WITH_MODELS=false docker compose up --build
 ```
+
+`docker-compose.yml` defaults `WITH_MODELS` to `true`; a plain
+`docker build .` uses the Dockerfile default (`false`), which is the lighter
+image a free host with 512 MB of RAM can actually run.
 
 ```bash
 docker run --rm -p 8000:8000 rag-research-assistant:latest
 curl -s localhost:8000/health
 ```
 
-The container runs as a non-root user, has a `HEALTHCHECK`, and deliberately runs
-a single Uvicorn worker (the index lives in process memory — scale with replicas
-behind a proxy, not workers).
+The container binds the port from `$PORT` (default `8000`), runs as a non-root
+user, has a `HEALTHCHECK`, and deliberately runs a single Uvicorn worker (the
+index lives in process memory — scale with replicas behind a proxy, not workers).
+
+## Deploy your own
+
+The repository is deployable to a free host as-is. Click the button to provision
+a free Render web service from `render.yaml`; it builds the Dockerfile and serves
+the demo UI at a public `onrender.com` URL:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/iwdie/rag-research-assistant)
+
+> Render's free plan is 0.1 CPU / 512 MB and spins down after 15 minutes idle
+> (~1 min cold start), so it runs the **fallback** backends. For the full
+> Sentence Transformers + cross-encoder stack on free 16 GB CPU hardware, deploy
+> a Hugging Face Docker Space. Both paths are written up in
+> [`deploy/README.md`](deploy/README.md).
 
 ## Evaluation
 

@@ -1,0 +1,29 @@
+# Render Blueprint - deploy this repository as a free public web service.
+#
+# https://render.com/docs/blueprint-spec
+#
+# The free plan is 0.1 CPU / 512 MB, which is enough for the dependency-free
+# fallback backends but not for torch. Render's Blueprint format has no
+# build-argument support, so the image is built with the Dockerfile's default
+# (WITH_MODELS=false) and the service runs the hashing embedder + lexical
+# reranker. For the full Sentence Transformers + cross-encoder stack, use a
+# Hugging Face Docker Space instead - see deploy/README.md.
+#
+# Render injects PORT (=10000) and the Dockerfile's CMD binds to it.
+services:
+  - type: web
+    name: rag-research-assistant
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: RAG_INDEX_DIR
+        value: /app/data/index
+      - key: RAG_FUSION
+        value: rrf
+      - key: RAG_RERANK
+        value: "true"
+      - key: RAG_GENERATOR
+        value: extractive

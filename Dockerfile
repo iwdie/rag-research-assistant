@@ -1,15 +1,18 @@
 # Single image for the API, built so the container can answer a question on
 # first boot with no model download and no network access at runtime.
 #
-# WITH_MODELS=false produces a ~200 MB image that runs the NumPy + hashing
-# fallbacks; the default installs FAISS, torch and Sentence Transformers, warms
-# both model caches at build time, and pre-builds the sample index with the same
-# embedder the runtime uses - mismatched embedding dimensions between a baked
-# index and the configured model is the classic way this kind of service fails
-# to start, so the build does it once, deliberately.
+# The default build installs the light dependency set (NumPy + hashing + lexical
+# fallbacks) and produces a ~250 MB image that starts in seconds. That is the
+# right default for a free host (Render's free plan is 512 MB, which cannot hold
+# torch). Pass --build-arg WITH_MODELS=true - as docker-compose.yml does - to
+# install FAISS, torch and Sentence Transformers instead, warm both model caches
+# at build time, and pre-build the sample index with the same embedder the
+# runtime uses. Mismatched embedding dimensions between a baked index and the
+# configured model is the classic way this kind of service fails to start, so
+# the build does it once, deliberately.
 FROM python:3.12-slim
 
-ARG WITH_MODELS=true
+ARG WITH_MODELS=false
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -42,18 +45,24 @@ CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"; \
 ENV RAG_INDEX_DIR=/app/data/index
 RUN python scripts/ingest.py --sample --index-dir /app/data/index
 
-# Run as a non-root user; /app/data is writable so uploads and the shut-down
-# save both work.
-RUN useradd --create-home --uid 10001 appuser \
+# Run as a non-root user. UID 1000 is the convention Hugging Face Spaces expects
+# (it runs the container as UID 1000); /app/data is writable by that user so
+# uploads and the shut-down save both work.
+RUN useradd --create-home --uid 1000 appuser \
  && chown -R appuser:appuser /app
 USER appuser
+
+# Most PaaS hosts (Render, Railway, Fly, Heroku) inject the port to bind via
+# PORT. 8000 is the local / docker-compose default.
+ENV PORT=8000
 
 EXPOSE 8000
 
 # Uses python rather than curl so the image needs no extra OS package.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD python -c "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status==200 else 1)"
+  CMD python -c "import os,sys,urllib.request; port=os.environ.get('PORT','8000'); sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:'+port+'/health', timeout=4).status==200 else 1)"
 
 # One worker on purpose: the index lives in process memory, so more workers
 # would each hold a private copy. Scale out with replicas behind a proxy.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# `exec` keeps uvicorn as PID 1 so it receives the host's SIGTERM directly.
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
