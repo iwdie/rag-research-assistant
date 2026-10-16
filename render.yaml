@@ -19,6 +19,10 @@ services:
     healthCheckPath: /health
     autoDeployTrigger: commit
     envVars:
+      # Render's default port for web services. The Dockerfile's CMD binds to
+      # $PORT, so this is belt-and-braces rather than strictly required.
+      - key: PORT
+        value: "10000"
       - key: RAG_INDEX_DIR
         value: /app/data/index
       - key: RAG_FUSION
