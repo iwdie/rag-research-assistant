@@ -1,0 +1,12 @@
+Denoising Diffusion Probabilistic Models
+
+We present high quality image synthesis using diffusion probabilistic models, a class of latent variable models inspired by non-equilibrium thermodynamics. Training amounts to learning to reverse a gradual noising process.
+
+Method
+A forward process gradually adds Gaussian noise to an image over a fixed number of timesteps until the signal is destroyed. The reverse process is parameterised by a neural network trained to predict the noise that was added at each step, which makes the training objective a simple weighted mean squared error. Sampling starts from pure Gaussian noise and repeatedly applies the learned denoising step to produce an image.
+
+Results
+The approach is progressive and controllable, so intermediate samples can be interpreted as a coarse-to-fine refinement of the final image. On CIFAR-10 the model achieves an inception score of 9.46 and a Frechet inception distance of 3.17, competitive with the best generative adversarial networks.
+
+Comparison with adversarial training
+Diffusion sampling is slow because it needs many denoising steps, so distillation and faster samplers are an active research area. Unlike adversarial training the denoising objective is stable and does not suffer from mode collapse, which is why it replaced generative adversarial networks for image work.

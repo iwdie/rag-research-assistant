@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        # true  -> FAISS + Sentence Transformers + cross-encoder (~2 GB image)
+        # false -> NumPy + hashing fallbacks, no model download (~250 MB image)
+        WITH_MODELS: "${WITH_MODELS:-true}"
+    image: rag-research-assistant:latest
+    ports:
+      - "8000:8000"
+    environment:
+      RAG_INDEX_DIR: /app/data/index
+      RAG_FUSION: rrf
+      RAG_CANDIDATE_K: "50"
+      RAG_TOP_K: "5"
+      RAG_RERANK: "true"
+      # Switch to the LLM answer generator by setting both of these.
+      RAG_GENERATOR: "${RAG_GENERATOR:-extractive}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      RAG_OPENAI_MODEL: "${RAG_OPENAI_MODEL:-gpt-4o-mini}"
+    volumes:
+      # Uploads and re-saved indexes survive a container restart. The image
+      # already contains a working index, so this can be omitted entirely.
+      - index-data:/app/data/index
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  index-data:

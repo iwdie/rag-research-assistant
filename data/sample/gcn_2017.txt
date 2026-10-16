@@ -1,0 +1,12 @@
+Semi-Supervised Classification with Graph Convolutional Networks
+
+We present a scalable approach for semi-supervised learning on graph-structured data based on an efficient variant of convolutional neural networks that operate directly on graphs.
+
+Layer
+Each layer propagates features along graph edges and then applies a shared linear transformation followed by a nonlinearity. The propagation rule is a first-order approximation of a spectral graph convolution, with a renormalisation trick that stabilises training on graphs with high-degree nodes.
+
+Results
+Using only a handful of labelled nodes per class, the model outperforms graph regularisation baselines on citation network datasets. The computational cost grows linearly in the number of edges, which is what makes the method practical on large graphs.
+
+Variants
+Graph attention networks learn a weight per edge instead of relying on fixed normalisation, which helps when the graph is noisy. Sampling based methods scale to graphs that do not fit in memory by training on fixed size neighbourhoods rather than the whole graph.

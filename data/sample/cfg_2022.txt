@@ -1,0 +1,9 @@
+Classifier-Free Diffusion Guidance
+
+We show that a diffusion model can be guided towards a conditioning signal without training a separate classifier. The guidance weight trades sample diversity for sample fidelity.
+
+Method
+The same network is trained with and without the condition by randomly dropping it, and the two predictions are combined at sampling time. Guidance requires two forward passes per denoising step, which roughly doubles the sampling cost of an already slow iterative process.
+
+Samplers
+Fewer denoising steps with a higher order sampler is the usual way to reduce sampling cost, and distillation trains a student to imitate a multi step trajectory. Both approaches trade sample quality for latency, and the acceptable operating point depends on the application.

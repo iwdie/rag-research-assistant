@@ -1,0 +1,9 @@
+{
+  "title": "Sentence Embeddings using Siamese Networks",
+  "year": 2019,
+  "venue": "EMNLP",
+  "authors": "Reimers and Gurevych",
+  "category": "retrieval",
+  "key": "sbert",
+  "synthetic": true
+}

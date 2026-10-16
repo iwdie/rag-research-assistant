@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAG Research Assistant</title>
+<style>
+  :root {
+    --bg: #0f1117; --panel: #161923; --panel-2: #1c2030; --line: #272c3b;
+    --fg: #e6e8ef; --muted: #99a1b3; --accent: #6ea8fe; --accent-2: #7ee2b8;
+    --warn: #ffcf6b; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  }
+  header { border-bottom: 1px solid var(--line); padding: 18px 24px; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  h1 { font-size: 17px; margin: 0; letter-spacing: .2px; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  main { max-width: 940px; margin: 0 auto; padding: 24px; }
+  .searchbar { display: flex; gap: 10px; }
+  input[type=text] {
+    flex: 1; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--line);
+    background: var(--panel); color: var(--fg); font-size: 15px;
+  }
+  input[type=text]:focus { outline: none; border-color: var(--accent); }
+  button {
+    padding: 12px 18px; border-radius: var(--radius); border: 1px solid var(--line);
+    background: var(--accent); color: #0b0d12; font-weight: 600; cursor: pointer; font-size: 14px;
+  }
+  button.ghost { background: var(--panel); color: var(--fg); font-weight: 500; }
+  button:disabled { opacity: .55; cursor: default; }
+  .controls { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  label.opt { color: var(--muted); font-size: 13px; display: flex; gap: 6px; align-items: center; }
+  .filters { flex: 1; min-width: 220px; }
+  .filters input { width: 100%; padding: 8px 10px; font-size: 13px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  section { margin-top: 26px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin: 0 0 10px; }
+  .answer { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; white-space: pre-wrap; }
+  .answer .gen { color: var(--muted); font-size: 12px; display: block; margin-top: 10px; }
+  ol.citations { list-style: none; margin: 0; padding: 0; }
+  ol.citations li {
+    background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent-2);
+    border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px;
+  }
+  .cite-head { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+  .cite-head b { color: var(--fg); font-weight: 600; }
+  .snippet { margin-top: 8px; font-size: 13.5px; color: #cdd3e0; }
+  .passage { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 10px; background: var(--panel-2); }
+  .passage summary { cursor: pointer; padding: 10px 14px; font-size: 13px; color: var(--muted); }
+  .passage .body { padding: 0 14px 14px; font-size: 13.5px; color: #cdd3e0; white-space: pre-wrap; }
+  .pill { display: inline-block; background: #232838; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; font-size: 11.5px; color: var(--muted); margin-right: 6px; }
+  .status { color: var(--muted); font-size: 13px; min-height: 20px; }
+  .error { color: #ff9c9c; }
+  footer { color: var(--muted); font-size: 12px; padding: 30px 24px 50px; text-align: center; }
+  code { background: #232838; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RAG Research Assistant</h1>
+  <span class="sub" id="stats">loading index…</span>
+</header>
+
+<main>
+  <div class="searchbar">
+    <input type="text" id="q" placeholder="Ask a question about the indexed papers…" autocomplete="off" />
+    <button id="go">Ask</button>
+  </div>
+
+  <div class="controls">
+    <label class="opt">top-k <input type="text" id="topk" value="5" style="width:44px;padding:6px 8px;font-size:13px;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;" /></label>
+    <label class="opt"><input type="checkbox" id="rerank" checked /> rerank</label>
+    <label class="opt"><input type="checkbox" id="debug" /> debug</label>
+    <div class="filters">
+      <input type="text" id="filters" placeholder='filters, e.g. category = retrieval' />
+    </div>
+  </div>
+  <div class="hint">
+    Filters accept <code>field = value</code>, <code>year &gt;= 2020</code>, <code>field in [a, b]</code>,
+    <code>field != value</code> or <code>field contains text</code>. Fields come from the document metadata:
+    <code>doc_id</code>, <code>category</code>, <code>year</code>, <code>venue</code>, <code>authors</code>.
+  </div>
+
+  <section>
+    <h2>Answer</h2>
+    <div class="status" id="status"></div>
+    <div class="answer" id="answer" hidden></div>
+  </section>
+
+  <section id="citations-section" hidden>
+    <h2>Sources</h2>
+    <ol class="citations" id="citations"></ol>
+  </section>
+
+  <section id="passages-section" hidden>
+    <h2>Retrieved &amp; reranked passages</h2>
+    <div id="passages"></div>
+  </section>
+</main>
+
+<footer>
+  BM25 + FAISS hybrid retrieval, cross-encoder reranking, cited answers.
+  Full API reference at <a href="/docs" style="color:var(--accent)">/docs</a>.
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let busy = false;
+
+function parseFilters(raw) {
+  const text = raw.trim();
+  if (!text) return null;
+  return text.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch("/stats");
+    if (!res.ok) throw new Error(await res.text());
+    const s = await res.json();
+    $("stats").textContent =
+      `${s.documents} documents · ${s.chunks} chunks · ${s.embedder} · vectors: ${s.vector_backend}` +
+      (s.reranker ? ` · reranker: ${s.reranker}` : " · reranker: off");
+  } catch (err) {
+    $("stats").textContent = "index unavailable";
+  }
+}
+
+function renderPassages(passages) {
+  const box = $("passages");
+  box.innerHTML = "";
+  $("passages-section").hidden = passages.length === 0;
+  passages.forEach((p, i) => {
+    const el = document.createElement("details");
+    el.className = "passage";
+    if (i === 0) el.open = true;
+    const ranks = `sparse #${p.ranks.sparse || "–"} · dense #${p.ranks.dense || "–"} · fused #${p.ranks.fused || "–"}`;
+    const rerank = p.rerank_score === null || p.rerank_score === undefined ? "" : ` · rerank ${p.rerank_score.toFixed(3)}`;
+    el.innerHTML =
+      `<summary><span class="pill">${p.chunk_id}</span> ${p.title || p.doc_id}` +
+      `${p.page ? ` · p.${p.page}` : ""} · score ${p.score.toFixed(3)}${rerank}</summary>` +
+      `<div class="body">${escapeHtml(p.text)}</div>` +
+      `<div class="body" style="color:var(--muted)">${ranks}</div>`;
+    box.appendChild(el);
+  });
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+async function ask() {
+  const question = $("q").value.trim();
+  if (!question || busy) return;
+  busy = true;
+  $("go").disabled = true;
+  $("status").className = "status";
+  $("status").textContent = "retrieving…";
+  $("answer").hidden = true;
+  $("citations-section").hidden = true;
+  $("passages-section").hidden = true;
+
+  const body = {
+    question,
+    top_k: Math.max(1, Math.min(50, parseInt($("topk").value, 10) || 5)),
+    rerank: $("rerank").checked,
+    debug: $("debug").checked,
+    filters: parseFilters($("filters").value),
+  };
+
+  try {
+    const res = await fetch("/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+
+    $("answer").hidden = false;
+    $("answer").innerHTML = escapeHtml(data.answer) +
+      `<span class="gen">generator: ${data.generator}` +
+      (data.debug ? ` · filtered rows: ${data.debug.filtered_rows} · fused candidates: ${data.debug.fused_candidates} · reranked: ${data.debug.rerank_applied}` : "") +
+      `</span>`;
+
+    const list = $("citations");
+    list.innerHTML = "";
+    data.citations.forEach((c) => {
+      const li = document.createElement("li");
+      li.innerHTML =
+        `<div class="cite-head"><span><b>[${c.marker}]</b> ${escapeHtml(c.title)}${c.page ? ` · page ${c.page}` : ""}</span>` +
+        `<span>score ${c.score.toFixed(3)}</span></div>` +
+        `<div class="snippet">${escapeHtml(c.snippet)}</div>` +
+        `<div class="cite-head" style="margin-top:6px"><span class="pill">${c.chunk_id}</span></div>`;
+      list.appendChild(li);
+    });
+    $("citations-section").hidden = data.citations.length === 0;
+    renderPassages(data.passages);
+    $("status").textContent = `${data.passages.length} passages · ${data.citations.length} citations`;
+  } catch (err) {
+    $("status").className = "status error";
+    $("status").textContent = `error: ${err.message}`;
+  } finally {
+    busy = false;
+    $("go").disabled = false;
+  }
+}
+
+$("go").addEventListener("click", ask);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+loadStats();
+</script>
+</body>
+</html>

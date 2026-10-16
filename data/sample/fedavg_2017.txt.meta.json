@@ -1,0 +1,9 @@
+{
+  "title": "Communication-Efficient Learning of Decentralised Data",
+  "year": 2017,
+  "venue": "AISTATS",
+  "authors": "McMahan et al.",
+  "category": "distributed systems",
+  "key": "fedavg",
+  "synthetic": true
+}

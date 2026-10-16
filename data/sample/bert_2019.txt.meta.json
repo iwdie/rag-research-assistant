@@ -1,0 +1,9 @@
+{
+  "title": "Pretraining of Deep Bidirectional Transformers",
+  "year": 2019,
+  "venue": "NAACL",
+  "authors": "Devlin et al.",
+  "category": "natural language processing",
+  "key": "bert",
+  "synthetic": true
+}

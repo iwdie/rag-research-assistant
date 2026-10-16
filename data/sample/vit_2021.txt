@@ -1,0 +1,12 @@
+An Image Is Worth Sixteen By Sixteen Words
+
+We show that a pure transformer applied directly to sequences of image patches performs very well on image classification. The architecture needs large-scale pretraining to compete with convolutional networks.
+
+Architecture
+An image is split into fixed-size patches, each patch is flattened and linearly projected, and the resulting sequence is fed to a standard transformer encoder. A learnable class token is prepended, and its final representation is used as the image representation for classification.
+
+Inductive bias
+Transformers lack the locality and translation equivariance that convolutions build in, so they generalise worse when trained on small datasets. Pretraining on a very large dataset such as ImageNet-21k or JFT-300M removes that disadvantage and the model then transfers well to smaller benchmarks.
+
+Variants
+Hybrid models interleave convolutional stems with transformer blocks to reintroduce locality at low cost. Self supervised pretraining such as masked image modelling reduces the dependence on labelled data and closes much of the remaining gap to convolutional networks.

@@ -1,0 +1,9 @@
+{
+  "title": "Training Language Models to Follow Instructions",
+  "year": 2022,
+  "venue": "NeurIPS",
+  "authors": "Ouyang et al.",
+  "category": "alignment",
+  "key": "rlhf",
+  "synthetic": true
+}

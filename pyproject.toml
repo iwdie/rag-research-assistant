@@ -1,0 +1,62 @@
+[project]
+name = "rag-research-assistant"
+version = "1.0.0"
+description = "Hybrid (BM25 + FAISS) retrieval over research PDFs with cross-encoder reranking and source-cited answers"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "iwdie" }]
+keywords = ["rag", "retrieval", "bm25", "faiss", "fastapi", "sentence-transformers"]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "python-multipart>=0.0.20",
+    "numpy>=1.26,<3",
+    "pypdf>=5.1",
+]
+
+[project.optional-dependencies]
+vector = ["faiss-cpu>=1.9", "sentence-transformers>=3.3"]
+dev = ["pytest>=8.3", "pytest-cov>=6.0", "httpx>=0.28", "reportlab>=4.2", "ruff>=0.8"]
+
+[project.scripts]
+rag-ingest = "scripts.ingest:main"
+rag-evaluate = "scripts.evaluate:main"
+
+[project.urls]
+Homepage = "https://github.com/iwdie/rag-research-assistant"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app", "app.api", "app.core", "app.evaluation", "app.services", "scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+filterwarnings = ["error::DeprecationWarning:app.*"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/static/*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["app", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "ARG", "PTH", "RET"]
+ignore = [
+    "E501",   # long lines are handled by the formatter, comments are allowed to run on
+    "B008",   # FastAPI depends on call-in-default
+    "RUF001", # ambiguous unicode is intentional in docstrings
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG", "S101"]
+"scripts/*" = ["E402"]  # sys.path is extended before the app imports

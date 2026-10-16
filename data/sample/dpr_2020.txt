@@ -1,0 +1,12 @@
+Dense Passage Retrieval for Open-Domain Question Answering
+
+We show that retrieval can be implemented with a dual encoder over dense vectors and trained from question-passage pairs alone. This outperforms a strong sparse BM25 baseline on open-domain question answering.
+
+Training
+The dual encoder is trained with an in-batch negative objective, using gold passages as positives and passages retrieved by BM25 as hard negatives. Similarity is measured with the dot product of the normalised question and passage vectors, which makes retrieval a maximum inner product search problem.
+
+Comparison
+Dense retrieval captures lexical mismatch that BM25 misses, for example when the question and the passage share meaning but not words. Hybrid strategies that combine sparse and dense scores are reported to give the best accuracy of all in the paper.
+
+Indexing
+The passage encoder runs offline over the whole corpus while the question encoder runs online, so answering a question is a single vector search. A FAISS index makes the maximum inner product search over millions of passages fast enough for interactive question answering.

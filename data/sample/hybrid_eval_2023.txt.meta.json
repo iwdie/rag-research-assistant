@@ -1,0 +1,9 @@
+{
+  "title": "On the Effectiveness of Hybrid Sparse and Dense Retrieval",
+  "year": 2023,
+  "venue": "ECIR",
+  "authors": "Bruch et al.",
+  "category": "retrieval",
+  "key": "hybrid_eval",
+  "synthetic": true
+}

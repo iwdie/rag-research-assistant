@@ -1,0 +1,9 @@
+{
+  "title": "An Image Is Worth Sixteen By Sixteen Words",
+  "year": 2021,
+  "venue": "ICLR",
+  "authors": "Dosovitskiy et al.",
+  "category": "generative vision",
+  "key": "vit",
+  "synthetic": true
+}

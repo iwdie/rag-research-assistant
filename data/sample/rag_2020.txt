@@ -1,0 +1,12 @@
+Retrieval-Augmented Generation for Knowledge-Intensive Tasks
+
+We combine a parametric sequence-to-sequence generator with a non-parametric dense retriever over a document index. The retriever supplies passages at generation time, so knowledge can be updated without retraining the model.
+
+Method
+The retriever encodes the question and the documents separately with a dual encoder, and the generator conditions on the retrieved passages to produce an answer. Because the retriever is non-parametric, the document index can be swapped for a new one without changing a single generator weight.
+
+Why it helps
+Conditioning on retrieved evidence reduces hallucination compared with a purely parametric model, and the retrieved passage provides a citation a reader can check. The approach is strongest on knowledge-intensive tasks where a closed-book model cannot store all the required facts in its parameters.
+
+Variants
+Later systems rerank retrieved passages with a cross-encoder before generation, which raises precision when the retriever returns many candidates. Retrieval can also be trained jointly with generation, so the gradients from the answer flow back into the retriever instead of being frozen.

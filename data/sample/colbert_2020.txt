@@ -1,0 +1,9 @@
+Late Interaction Retrieval over Token Embeddings
+
+We propose a late interaction model that keeps one vector per token and scores a query passage pair with a cheap maximum similarity operation. It keeps much of the quality of a cross-encoder at a fraction of the cost.
+
+Scoring
+Every query token is matched against every passage token and the maximum similarity is summed, so the passage is scored jointly rather than as a single vector. Because the token embeddings are precomputed, the interaction is a matrix operation rather than a forward pass through a large encoder.
+
+Comparison with cross-encoders
+A cross-encoder still reranks the top candidates more accurately, and production systems commonly use late interaction to shortlist and a cross-encoder to order. Late interaction needs far more index storage than a single passage vector, which is the main practical cost of the approach.

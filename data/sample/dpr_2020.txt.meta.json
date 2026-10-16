@@ -1,0 +1,9 @@
+{
+  "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+  "year": 2020,
+  "venue": "EMNLP",
+  "authors": "Karpukhin et al.",
+  "category": "retrieval",
+  "key": "dpr",
+  "synthetic": true
+}

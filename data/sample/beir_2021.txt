@@ -1,0 +1,9 @@
+A Heterogeneous Benchmark for Zero-Shot Retrieval Evaluation
+
+We release a benchmark of diverse retrieval datasets to test whether a model trained on one collection transfers to another. Strong in-domain models turn out to generalise poorly without training on the target data.
+
+Metrics
+Retrieval quality is reported with recall at several cut offs, mean reciprocal rank and normalised discounted cumulative gain, because no single number captures both ranking position and coverage. Recall at k measures whether the evidence was retrieved at all, while reciprocal rank measures how high it was ranked, and a production system needs both.
+
+Findings
+BM25 is a remarkably strong baseline on out of domain collections, and hybrid approaches that combine sparse and dense scores are the most robust across them. Larger labeled training sets matter more than larger models for transfer, which is why hard negatives and distillation are common in later work.

@@ -1,0 +1,9 @@
+{
+  "title": "Parameter-Efficient Transfer Learning Compared",
+  "year": 2022,
+  "venue": "ACL",
+  "authors": "Ruckle et al.",
+  "category": "efficiency",
+  "key": "adapters",
+  "synthetic": true
+}

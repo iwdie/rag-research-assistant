@@ -1,0 +1,9 @@
+{
+  "title": "Query Expansion with Pseudo Relevance Feedback",
+  "year": 1998,
+  "venue": "SIGIR",
+  "authors": "Robertson and Walker",
+  "category": "retrieval",
+  "key": "prf",
+  "synthetic": true
+}

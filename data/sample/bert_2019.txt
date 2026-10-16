@@ -1,0 +1,12 @@
+Pretraining of Deep Bidirectional Transformers
+
+We introduce a bidirectional encoder pretrained with a masked language modelling objective. The pretrained model can be fine-tuned with one additional output layer to reach strong results across a wide range of sentence-level and token-level tasks.
+
+Pretraining objective
+The masked language model objective randomly masks fifteen percent of input tokens and trains the encoder to recover them from their two-sided context. A next sentence prediction objective is trained jointly, although later work shows it contributes little to downstream accuracy.
+
+Fine-tuning
+Fine-tuning is inexpensive because the same pretrained parameters are reused for every downstream task with only small task-specific heads added. The model sets new state of the art results on the GLUE benchmark and on the SQuAD question answering dataset.
+
+Limitations
+Masked pretraining is compute hungry because the encoder is large and each step only supervises fifteen percent of the input tokens. Later encoders drop the next sentence prediction objective, train longer, and use more data, which improves downstream accuracy at the same architecture size.

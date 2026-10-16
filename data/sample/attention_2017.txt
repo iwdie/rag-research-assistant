@@ -1,0 +1,18 @@
+Attention Is All You Need
+
+We propose the Transformer, a sequence transduction architecture based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. The model reaches state of the art translation quality while being substantially more parallelisable than recurrent networks.
+
+Architecture
+The Transformer stacks an encoder and a decoder, each built from identical layers of multi-head self-attention followed by a position-wise feed-forward network. Because recurrence is removed, the model has no inherent notion of token order, so sinusoidal positional encodings are added to the input embeddings. Multi-head attention projects queries, keys and values into several subspaces so that different heads can attend to different kinds of relationships.
+
+Training
+The model is trained on the WMT 2014 English to German and English to French translation benchmarks using the Adam optimiser with a warmup schedule. Dropout and label smoothing are used as regularisation, and attention weights are visualised to inspect what individual heads learn.
+
+Results
+On WMT 2014 English to German the big Transformer reaches 28.4 BLEU, more than two BLEU above the best previously reported ensembles. Training the big configuration on eight GPUs takes about three and a half days, a small fraction of the cost of comparable recurrent systems.
+
+Complexity
+Self-attention costs quadratic time in the sequence length, which is why long context variants use sparse or sliding window attention. Every additional context token increases the cost of attention, so the quadratic term is the usual motivation for efficient attention research.
+
+Follow-up work
+Decoder-only variants keep the same attention mechanism but drop the encoder and train on a next token prediction objective. These models scale predictably with parameters and data, which is what makes the architecture the default backbone for language modelling.

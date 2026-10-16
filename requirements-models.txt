@@ -1,0 +1,4 @@
+# The real embedding + reranking stack, kept separate because `pip install -r
+# requirements-models.txt` downloads torch (hundreds of megabytes). CI installs
+# this on a schedule, not on every push.
+-r requirements-vector.txt

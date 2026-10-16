@@ -1,0 +1,12 @@
+Sentence Embeddings using Siamese Networks
+
+We derive sentence embeddings that are comparable with cosine similarity by fine-tuning a pretrained transformer on a siamese network. The resulting encoder is orders of magnitude faster than a cross-encoder at comparable accuracy.
+
+Motivation
+A cross-encoder that feeds both sentences through the transformer jointly is accurate but too slow to score millions of pairs at query time. Pooling the token embeddings with mean pooling produces a fixed-size vector that can be compared in constant time.
+
+Training data
+The network is trained on natural language inference data, where entailed pairs are positives and contradictory pairs are negatives, which makes the embedding space meaningful for semantic similarity. The same encoder transfers to clustering and semantic search with no further training.
+
+Limitations
+Mean pooling discards word order, so negation and other order sensitive phenomena are represented imperfectly by a single sentence vector. Training with hard negatives mined from a first pass gives much sharper embeddings than sampling random negatives alone.

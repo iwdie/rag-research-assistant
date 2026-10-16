@@ -1,0 +1,12 @@
+Low-Rank Adaptation of Large Language Models
+
+We freeze the pretrained weights and inject trainable low-rank matrices into each layer of the transformer. This reduces the number of trainable parameters by several orders of magnitude with no added inference latency.
+
+Method
+For a frozen weight matrix the update is reparameterised as the product of two much smaller matrices, so the number of trainable parameters drops sharply. At inference time the low-rank matrices can be merged into the frozen weights, so the adapted model has exactly the same architecture and latency as the base model.
+
+Benefits
+Different tasks can be served from the same base model by swapping only the small adapter weights, which makes multi-task serving practical. The method is orthogonal to quantisation and pruning and is usually combined with them in practice.
+
+Configuration
+The rank and the choice of adapted weight matrices are the main knobs, and a small rank applied to the attention projections is a common default. Adapters can differ per client, which also makes them useful when a shared base model has to serve many downstream tasks.

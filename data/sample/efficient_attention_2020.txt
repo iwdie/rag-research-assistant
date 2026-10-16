@@ -1,0 +1,12 @@
+Efficient Transformers: Sparse and Linear Attention
+
+We survey efficient attention variants that reduce the quadratic cost of self attention over long sequences. Approaches fall into fixed patterns, learned patterns, low rank approximations and memory-based methods.
+
+Fixed patterns
+Block and stride patterns restrict each query to a fixed set of keys, which drops the quadratic attention term to linear in the sequence length. Sliding window attention keeps a local context for every token and combines layers so that information propagates across the whole sequence.
+
+Low rank and kernels
+Low rank approximations factorise the attention matrix, while kernel methods rewrite attention as a linear operation over feature maps. Both families trade exactness for throughput and tend to lose accuracy on tasks that need precise long range retrieval of a single token.
+
+Evaluation
+Comparisons are usually reported on long document classification and on retrieval of a fact from a long context, where sparse attention degrades gracefully.

@@ -1,0 +1,9 @@
+{
+  "title": "Low-Rank Adaptation of Large Language Models",
+  "year": 2021,
+  "venue": "ICLR",
+  "authors": "Hu et al.",
+  "category": "efficiency",
+  "key": "lora",
+  "synthetic": true
+}

@@ -1,0 +1,9 @@
+Parameter-Efficient Transfer Learning Compared
+
+We compare adapter modules, prefix tuning and low rank reparameterisation under a matched parameter budget and find that the choice matters less than the budget itself.
+
+Comparison
+With an equal number of trainable parameters the methods perform similarly, so the rank and the placement of the adapted matrices matter more than the reparameterisation. Prefix tuning keeps the base weights untouched but reserves context length, which can be a real cost when the input is already long.
+
+Serving
+All of the methods allow one base model to serve many tasks by loading a small set of adapter weights, but only some can be merged so that inference latency is unchanged. Merging is what makes a parameter efficient method attractive for latency sensitive deployments, and it is not available for attention prefix methods.

@@ -1,0 +1,18 @@
+# Core runtime. Everything here is pure-Python or has a manylinux wheel, so an
+# install takes seconds and the whole test suite runs offline.
+#
+# The retrieval pipeline degrades gracefully without these, but installing them
+# is what turns the fallbacks off:
+#   requirements-vector.txt  -> FAISS index + Sentence Transformers bi-encoder
+# See requirements-models.txt for the cross-encoder.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+
+# Numerics
+numpy>=1.26,<3
+
+# PDF text extraction
+pypdf==5.1.0

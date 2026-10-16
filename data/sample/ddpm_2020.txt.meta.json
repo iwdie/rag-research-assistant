@@ -1,0 +1,9 @@
+{
+  "title": "Denoising Diffusion Probabilistic Models",
+  "year": 2020,
+  "venue": "NeurIPS",
+  "authors": "Ho et al.",
+  "category": "generative vision",
+  "key": "ddpm",
+  "synthetic": true
+}

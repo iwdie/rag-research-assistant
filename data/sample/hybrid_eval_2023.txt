@@ -1,0 +1,9 @@
+On the Effectiveness of Hybrid Sparse and Dense Retrieval
+
+We study when combining sparse and dense retrieval actually helps, and find that the gain depends on how differently the two scorers rank the same candidate pool.
+
+Fusion
+Reciprocal rank fusion needs no score calibration and is competitive with tuned weighted sums, which is why it is the usual default in hybrid systems. Score normalisation before a weighted sum helps only when the two retrievers are already individually well calibrated, otherwise fusion by rank is safer.
+
+When it fails
+If both retrievers make the same mistake the fused ranking inherits it, so hybrid search is not a fix for a corpus with no relevant passage at all. Diversity between the two rankings, not the absolute quality of either one, is what predicts whether fusion will improve recall at k.

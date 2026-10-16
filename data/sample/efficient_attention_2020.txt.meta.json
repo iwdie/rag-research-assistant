@@ -1,0 +1,9 @@
+{
+  "title": "Efficient Transformers: Sparse and Linear Attention",
+  "year": 2020,
+  "venue": "ACM Computing Surveys",
+  "authors": "Tay et al.",
+  "category": "natural language processing",
+  "key": "efficient_attention",
+  "synthetic": true
+}

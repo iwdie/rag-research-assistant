@@ -1,0 +1,17 @@
+# Development and CI. FAISS is included so the FAISS and NumPy search paths are
+# compared against each other in CI rather than only on a developer machine.
+# sentence-transformers is deliberately *not* here - it drags in torch and turns
+# a 20-second CI run into a multi-minute one. The scheduled workflow
+# (.github/workflows/models.yml) installs it and runs the same suite with the
+# real models enabled.
+-r requirements.txt
+
+pytest==8.3.4
+pytest-cov==6.0.0
+httpx==0.28.1
+faiss-cpu==1.9.0.post1
+
+# Only needed by tests/test_ingest.py to synthesise PDFs for the pypdf path.
+reportlab==4.2.5
+
+ruff==0.8.4

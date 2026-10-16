@@ -1,0 +1,9 @@
+{
+  "title": "Late Interaction Retrieval over Token Embeddings",
+  "year": 2020,
+  "venue": "SIGIR",
+  "authors": "Khattab and Zaharia",
+  "category": "retrieval",
+  "key": "colbert",
+  "synthetic": true
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Retrieval-Augmented Generation: Methods and Open Problems",
+  "year": 2023,
+  "venue": "Survey",
+  "authors": "Gao et al.",
+  "category": "retrieval",
+  "key": "rag_survey",
+  "synthetic": true
+}

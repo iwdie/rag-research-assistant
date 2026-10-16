@@ -1,0 +1,9 @@
+{
+  "title": "Attention Is All You Need",
+  "year": 2017,
+  "venue": "NeurIPS",
+  "authors": "Vaswani et al.",
+  "category": "natural language processing",
+  "key": "attention",
+  "synthetic": true
+}

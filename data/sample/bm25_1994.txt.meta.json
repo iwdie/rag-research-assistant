@@ -1,0 +1,9 @@
+{
+  "title": "Okapi at TREC-3: Probabilistic Ranking",
+  "year": 1994,
+  "venue": "TREC",
+  "authors": "Robertson et al.",
+  "category": "retrieval",
+  "key": "bm25",
+  "synthetic": true
+}

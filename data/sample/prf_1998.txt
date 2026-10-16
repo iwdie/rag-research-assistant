@@ -1,0 +1,9 @@
+Query Expansion with Pseudo Relevance Feedback
+
+We evaluate automatic query expansion, where the top ranked documents from a first pass are used to select additional query terms. Expansion raises recall but can also drift away from the original information need.
+
+Method
+A first retrieval pass produces a candidate set and the most discriminating terms from those documents are added to the query with a weight. Relevance feedback from a human is more reliable than pseudo relevance feedback, which assumes the first pass is mostly correct.
+
+Effect on metrics
+Expansion usually improves recall at larger cut offs while precision at one can fall, so the choice depends on whether a user reads the first result or scans a list. Query drift is the failure mode: the expanded query retrieves a coherent but wrong topic, and no automatic metric flags it reliably.

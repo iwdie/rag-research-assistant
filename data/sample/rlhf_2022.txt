@@ -1,0 +1,12 @@
+Training Language Models to Follow Instructions
+
+We fine-tune a large language model with human feedback so that it behaves as an instruction-following assistant. A reward model learned from human comparisons is optimised with reinforcement learning against a penalised objective.
+
+Pipeline
+The pipeline has three stages: supervised fine-tuning on demonstrations, reward model training on human preference comparisons, and policy optimisation with proximal policy optimisation. A per-token Kullback-Leibler penalty keeps the tuned policy close to the supervised model and prevents reward hacking.
+
+Findings
+Human raters prefer the tuned model over the base model, and the improvements transfer to a held-out set of prompts that were never used for training. The paper calls the mismatch between the training objective and human preferences misalignment, and it is the reason evaluation on held-out prompts matters.
+
+Evaluation
+Comparing two policies requires pairwise human judgement, and inter annotator agreement is a real limit on reward model quality. Automatic benchmarks saturate quickly, so held out prompts and red teaming are used alongside preference metrics.

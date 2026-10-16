@@ -1,0 +1,9 @@
+Retrieval-Augmented Generation: Methods and Open Problems
+
+We organise recent retrieval augmented generation systems by retrieval stage, fusion strategy and generation recipe, and list the evaluation problems that remain open.
+
+Architectures
+Systems differ in whether retrieval happens once before generation, at every decoding step, or iteratively, with a critique model deciding when the evidence is sufficient. Hybrid retrieval that fuses a sparse BM25 ranking with a dense FAISS ranking is the most common default because it does not depend on the retriever being well trained.
+
+Evaluation
+Retrieval is measured with recall at k and mean reciprocal rank on a labelled set, while the final answer needs faithfulness and citation accuracy measured separately. A common failure is a correct retriever paired with a generator that ignores the evidence, which retrieval metrics cannot detect.

@@ -1,0 +1,12 @@
+Communication-Efficient Learning of Decentralised Data
+
+We investigate federated learning, a setting where training data stays on mobile devices and only model updates are communicated. Averaging locally computed updates requires far fewer communication rounds than synchronised stochastic gradient descent.
+
+Algorithm
+Each round samples a subset of clients, and every selected client performs several epochs of local SGD on its own private data. The server then averages the resulting client models, weighted by the number of local examples, to form the next global model.
+
+Trade-offs
+More local computation per round reduces the number of communication rounds, which is usually the bottleneck on a mobile network. The approach assumes clients are honest, and a malicious client can bias the global model, which motivates robust aggregation research.
+
+Extensions
+Secure aggregation and differential privacy protect individual updates from the server, at some cost in accuracy and communication. Personalisation adds a small per client adapter so that a single global model can still fit heterogeneous devices.

@@ -1,0 +1,9 @@
+{
+  "title": "A Heterogeneous Benchmark for Zero-Shot Retrieval Evaluation",
+  "year": 2021,
+  "venue": "NeurIPS Datasets",
+  "authors": "Thakur et al.",
+  "category": "retrieval",
+  "key": "beir",
+  "synthetic": true
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Semi-Supervised Classification with Graph Convolutional Networks",
+  "year": 2017,
+  "venue": "ICLR",
+  "authors": "Kipf and Welling",
+  "category": "graphs",
+  "key": "gcn",
+  "synthetic": true
+}

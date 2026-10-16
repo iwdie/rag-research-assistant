@@ -1,0 +1,12 @@
+# Vector search and dense embeddings.
+#
+#   faiss-cpu                exact inner-product index (IndexFlatIP)
+#   sentence-transformers    bi-encoder embeddings + cross-encoder reranking
+#                            (pulls in torch, hence the separate file)
+#
+# Both are optional: app/core/vector_store.py falls back to NumPy brute force
+# and app/core/embeddings.py to a hashing embedder that needs only NumPy.
+-r requirements.txt
+
+faiss-cpu==1.9.0.post1
+sentence-transformers==3.3.1

@@ -1,0 +1,32 @@
+# Keep the build context small: the image installs its own dependencies and
+# builds its own index, so nothing generated locally should be uploaded.
+.git
+.gitignore
+.github
+.venv
+venv
+__pycache__
+**/__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+.mypy_cache
+
+# Derived data is rebuilt inside the image. data/sample is deliberately NOT
+# ignored: the image copies it and builds the index from it at build time.
+data/index
+data/uploads
+data/sample_pdf
+
+# Docs and tests are not needed at runtime.
+tests
+docs
+*.md
+!README.md
+
+# Local config and secrets
+.env
+.env.*
+!.env.example

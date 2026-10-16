@@ -1,0 +1,17 @@
+# Store text files with LF in the repository and check them out with the
+# platform default. This keeps the committed corpus (data/sample/) and test set
+# (eval/testset.jsonl) independent of a contributor's core.autocrlf setting:
+# CI regenerates them on Linux and asserts `git diff --exit-code`, which only
+# holds if the repository copy is LF regardless of who committed it.
+* text=auto
+
+# The Docker image is built and run on Linux, so these must stay LF in the
+# working tree as well or the entrypoint scripts misbehave.
+*.sh text eol=lf
+Dockerfile text eol=lf
+
+# Binary assets, in case any are added later.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.npy binary

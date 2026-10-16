@@ -1,0 +1,12 @@
+Okapi at TREC-3: Probabilistic Ranking
+
+We describe the Okapi probabilistic retrieval system and its ranking function, which remains the standard sparse baseline for text retrieval. The function combines term frequency saturation with document length normalisation.
+
+Ranking function
+The score of a document is the sum over query terms of an inverse document frequency weight multiplied by a saturated term frequency factor. The parameter k1 controls how quickly term frequency saturates, and the parameter b controls how strongly long documents are penalised. Setting b to zero disables length normalisation, while the common default of 0.75 is a compromise that works well across collections.
+
+Practical notes
+Inverse document frequency is computed over the whole collection, so adding documents changes the score of every existing document. BM25 needs no training and no GPU, which is why it is still the first baseline a retrieval system is measured against.
+
+Extensions
+Field weighting and proximity boosts are common additions, and the fielded variant applies the same saturation separately to each document field. Query expansion with pseudo relevance feedback can raise recall at the cost of additional latency and a second retrieval pass.

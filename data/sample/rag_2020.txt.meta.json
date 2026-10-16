@@ -1,0 +1,9 @@
+{
+  "title": "Retrieval-Augmented Generation for Knowledge-Intensive Tasks",
+  "year": 2020,
+  "venue": "NeurIPS",
+  "authors": "Lewis et al.",
+  "category": "retrieval",
+  "key": "rag",
+  "synthetic": true
+}

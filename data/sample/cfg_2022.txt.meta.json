@@ -1,0 +1,9 @@
+{
+  "title": "Classifier-Free Diffusion Guidance",
+  "year": 2022,
+  "venue": "NeurIPS Workshop",
+  "authors": "Ho and Salimans",
+  "category": "generative vision",
+  "key": "cfg",
+  "synthetic": true
+}
