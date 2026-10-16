@@ -53,6 +53,25 @@
   .pill { display: inline-block; background: #232838; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; font-size: 11.5px; color: var(--muted); margin-right: 6px; }
   .status { color: var(--muted); font-size: 13px; min-height: 20px; }
   .error { color: #ff9c9c; }
+  .drop {
+    border: 1.5px dashed var(--line); border-radius: var(--radius); background: var(--panel);
+    padding: 18px; text-align: center; color: var(--muted); font-size: 13.5px; cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .drop.over { border-color: var(--accent); background: var(--panel-2); color: var(--fg); }
+  .drop button { margin-left: 6px; padding: 7px 12px; font-size: 13px; }
+  ul.docs { list-style: none; margin: 12px 0 0; padding: 0; }
+  ul.docs li {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 6px;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); font-size: 13px;
+  }
+  ul.docs li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ul.docs li .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  ul.docs li .x {
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    padding: 3px 10px; font-size: 12px; font-weight: 500;
+  }
+  ul.docs li .x:hover { color: #ff9c9c; border-color: #ff9c9c; }
   footer { color: var(--muted); font-size: 12px; padding: 30px 24px 50px; text-align: center; }
   code { background: #232838; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
 </style>
@@ -82,6 +101,22 @@
     <code>field != value</code> or <code>field contains text</code>. Fields come from the document metadata:
     <code>doc_id</code>, <code>category</code>, <code>year</code>, <code>venue</code>, <code>authors</code>.
   </div>
+
+  <section id="library">
+    <h2>Documents</h2>
+    <div class="drop" id="drop">
+      <input type="file" id="files" multiple accept=".pdf,.txt,.md,.markdown" hidden />
+      Drag &amp; drop a PDF, <code>.txt</code> or <code>.md</code> here — or
+      <button class="ghost" id="pick">choose files</button>
+    </div>
+    <div class="status" id="upload-status"></div>
+    <ul class="docs" id="docs"></ul>
+    <div class="hint">
+      Uploaded documents are indexed straight away and are searchable below.
+      On a free host the filesystem is temporary, so uploads disappear when the
+      server restarts — the bundled corpus always comes back.
+    </div>
+  </section>
 
   <section>
     <h2>Answer</h2>
@@ -209,9 +244,96 @@ async function ask() {
   }
 }
 
+// -- documents --------------------------------------------------------------
+async function loadDocs() {
+  const list = $("docs");
+  try {
+    const res = await fetch("/documents");
+    if (!res.ok) throw new Error(res.statusText);
+    const docs = await res.json();
+    list.innerHTML = "";
+    if (!docs.length) {
+      list.innerHTML = '<li><span class="meta">the index is empty — upload something above</span></li>';
+      return;
+    }
+    docs.forEach((d) => {
+      const li = document.createElement("li");
+      const chunks = `${d.chunk_count} chunk${d.chunk_count === 1 ? "" : "s"}`;
+      li.innerHTML =
+        `<span class="pill">${d.doc_id}</span>` +
+        `<span class="name">${escapeHtml(d.title || d.source || d.doc_id)}</span>` +
+        `<span class="meta">${chunks}</span>`;
+      const remove = document.createElement("button");
+      remove.className = "x";
+      remove.textContent = "remove";
+      remove.addEventListener("click", () => removeDoc(d.doc_id, d.title || d.doc_id));
+      li.appendChild(remove);
+      list.appendChild(li);
+    });
+  } catch (err) {
+    list.innerHTML = `<li class="error">could not list documents: ${escapeHtml(err.message)}</li>`;
+  }
+}
+
+async function removeDoc(docId, title) {
+  if (!window.confirm(`Remove "${title}" from the index?`)) return;
+  setUploadStatus("removing…");
+  try {
+    const res = await fetch(`/documents/${encodeURIComponent(docId)}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    setUploadStatus(`removed ${docId} · ${data.chunks_removed} chunks dropped`);
+    await Promise.all([loadStats(), loadDocs()]);
+  } catch (err) {
+    setUploadStatus(`error: ${err.message}`, true);
+  }
+}
+
+async function uploadFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  const form = new FormData();
+  files.forEach((f) => form.append("files", f));
+
+  setUploadStatus(`indexing ${files.length} file${files.length === 1 ? "" : "s"}…`);
+  try {
+    const res = await fetch("/index/documents", { method: "POST", body: form });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    const parts = [`indexed ${data.indexed.length}`, `+${data.chunks_added} chunks`];
+    if (data.failed.length) parts.push(`failed: ${data.failed.join("; ")}`);
+    setUploadStatus(parts.join(" · "), data.failed.length > 0 && data.indexed.length === 0);
+    await Promise.all([loadStats(), loadDocs()]);
+  } catch (err) {
+    setUploadStatus(`error: ${err.message}`, true);
+  } finally {
+    $("files").value = "";
+  }
+}
+
+function setUploadStatus(text, isError = false) {
+  $("upload-status").className = isError ? "status error" : "status";
+  $("upload-status").textContent = text;
+}
+
+const drop = $("drop");
+drop.addEventListener("click", () => $("files").click());
+$("pick").addEventListener("click", (e) => { e.stopPropagation(); $("files").click(); });
+$("files").addEventListener("change", (e) => uploadFiles(e.target.files));
+["dragenter", "dragover"].forEach((ev) =>
+  drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "dragend"].forEach((ev) =>
+  drop.addEventListener(ev, () => drop.classList.remove("over")));
+drop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  drop.classList.remove("over");
+  uploadFiles(e.dataTransfer.files);
+});
+
 $("go").addEventListener("click", ask);
 $("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
 loadStats();
+loadDocs();
 </script>
 </body>
 </html>
